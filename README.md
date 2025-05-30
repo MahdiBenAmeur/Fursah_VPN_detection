@@ -48,8 +48,8 @@ FURSAH_CODE/
 | 2    | `merge.py`             | All scenario-level CSVs are concatenated → **`data.csv`**. An extra column `scenario_id` is added so you can stratify by capture session if needed. |
 | 3    | `Fursah.ipynb` – Section **1 & 2** | Loads `data.csv`, performs cleaning, derives a **binary label** `is_vpn`, handles missing values, and casts everything to `float32` for lighter models. |
 | 4    | Notebook – Section **3** | Exploratory analysis: descriptive stats, distribution plots, correlation heat-map. |
-| 5    | Notebook – Section **4** | Feature/target split, train-test split (80-20, stratified). |
-| 6    | Notebook – Section **5** | **Model zoo** (LogReg, Decision Tree, Random Forest, LightGBM, XGBoost). Hyper-parameters are kept intentionally light for fast iteration. |
+| 5    | Notebook – Section **4** | Feature/target split. |
+| 6    | Notebook – Section **5** | **Model zoo** (LogReg, Decision Tree, Random Forest, LightGBM, XGBoost).  |
 | 7    | Notebook – Section **6** | Metrics gathered (Accuracy, Precision, Recall, F1, Inference time) ➜ saved to `model_comparison_results.csv`; best model’s artefact + metadata dumped to `saved_models/`. |
 | 8    | Notebook – Section **7** | *How-to-reload* snippet that demonstrates loading the chosen model and its expected feature list in a production script. |
 
