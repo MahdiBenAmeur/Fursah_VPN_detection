@@ -1,138 +1,92 @@
-# VPN Detection Models - Cybersecurity Competition
-
-This project implements and compares multiple machine learning models for VPN vs Non-VPN traffic classification. The primary goal is to explore, visualize the dataset, train various classification models, compare their accuracy and training speed, and save the best-performing models for potential deployment.
-
-**Author:** Mahdi Ben Ameur
-**Task:** VPN Traffic Classification
+# FURSAH — VPN Detection & Traffic-Type Classification  
+*Author: Mahdi Ben Ameur*  
 
 ---
 
-## Objectives
-
-* Explore and visualize the traffic dataset.
-* Train multiple machine learning classification models.
-* Compare the accuracy and training speed of the trained models.
-* Save the trained models for future use or deployment.
+## 1 . Project goal
+This repository contains the **end-to-end pipeline** I built for the Fursah cybersecurity competition.  
+The objective is to learn a model that distinguishes **VPN** from **non-VPN** network traffic (and act as a first step toward a broader traffic-source classifier).
 
 ---
 
-## Project Structure
+## 2 . Repository layout
 
-.
-├── backup/
-│   └── ... (backup files)
-├── data/
-│   ├── Scenario A1-ARFF/
-│   │   └── ... (ARFF data files)
-│   ├── Scenario A2-ARFF/
-│   │   └── ... (ARFF data files)
-│   └── Scenario B-ARFF/
-│       └── ... (ARFF data files)
-├── fursah_venv/
-│   └── ... (Python virtual environment files - typically in .gitignore)
-├── saved_models/
-│   ├── decision_tree_model.joblib
-│   ├── lightgbm_model.joblib
-│   ├── logistic_regression_model.joblib
-│   ├── model_comparison_results.csv
-│   ├── model_metadata.joblib
-│   ├── random_forest_model.joblib
-│   └── xgboost_model.joblib
-├── .gitignore
-├── convert_to_csv.py
-├── data.csv
-├── Fursah.ipynb
-└── merge.py
+FURSAH_CODE/
+│
+├── data/ # Raw datasets
+│ ├── Scenario A1-ARFF/ # ⇣ exported by UNB ISCXFlowMeter
+│ ├── Scenario A2-ARFF/ # ⇢ each “Scenario X” ≈ one capture session
+│ └── Scenario B-ARFF/
+│
+├── saved_models/ # Persisted artefacts (Joblib)
+│ ├── decision_tree_model.joblib
+│ ├── lightgbm_model.joblib
+│ ├── logistic_regression_model.joblib
+│ ├── random_forest_model.joblib
+│ ├── xgboost_model.joblib
+│ ├── model_metadata.joblib # feature list, preprocessing details, etc.
+│ └── model_comparison_results.csv
+│
+├── convert_to_csv.py # ARFF ➜ CSV converter
+├── merge.py # Merges per-scenario CSVs → data.csv
+├── data.csv # 59 707 flows × 27 features (after merge)
+├── Fursah.ipynb # Notebook: EDA + training + evaluation
+├── .gitignore # ignores venv & temp artefacts
+└── fursah_venv/ # local virtual-env (not committed)
+
+
 
 
 ---
 
-## Dataset
+## 3 . Data pipeline
 
-The primary dataset used for training and evaluation is `data.csv`. This CSV file is derived from initial ARFF files located in the `data/` subdirectories (`Scenario A1-ARFF`, `Scenario A2-ARFF`, `Scenario B-ARFF`). The `convert_to_csv.py` script might be used for this conversion or for merging different data sources.
-
-The dataset contains various network flow features, and the target variable `class1` indicates whether the traffic is "VPN" or "Non-VPN". This is later converted to a binary flag `vpn_flag` (1 for VPN, 0 for Non-VPN) for modeling.
-
----
-
-## Setup and Installation
-
-1.  **Clone the repository:**
-    ```bash
-    git clone <your-repository-url>
-    cd <repository-name>
-    ```
-
-2.  **Create and activate a virtual environment (recommended):**
-    ```bash
-    python -m venv fursah_venv
-    source fursah_venv/bin/activate  # On Windows use `fursah_venv\Scripts\activate`
-    ```
-
-3.  **Install required libraries:**
-    The project uses several Python libraries for data manipulation, machine learning, and visualization. You can install them using pip:
-    ```bash
-    pip install pandas numpy matplotlib seaborn scikit-learn xgboost lightgbm joblib
-    ```
-    *(Note: `catboost` is commented out in the notebook but can be added if needed.)*
+| Step | Script / Notebook cell | What happens |
+|------|------------------------|--------------|
+| 1    | `convert_to_csv.py`    | Each **ARFF** file (output of ISCXFlowMeter) is parsed and saved as a tidy CSV. |
+| 2    | `merge.py`             | All scenario-level CSVs are concatenated → **`data.csv`**. An extra column `scenario_id` is added so you can stratify by capture session if needed. |
+| 3    | `Fursah.ipynb` – Section **1 & 2** | Loads `data.csv`, performs cleaning, derives a **binary label** `is_vpn`, handles missing values, and casts everything to `float32` for lighter models. |
+| 4    | Notebook – Section **3** | Exploratory analysis: descriptive stats, distribution plots, correlation heat-map. |
+| 5    | Notebook – Section **4** | Feature/target split, train-test split (80-20, stratified). |
+| 6    | Notebook – Section **5** | **Model zoo** (LogReg, Decision Tree, Random Forest, LightGBM, XGBoost). Hyper-parameters are kept intentionally light for fast iteration. |
+| 7    | Notebook – Section **6** | Metrics gathered (Accuracy, Precision, Recall, F1, Inference time) ➜ saved to `model_comparison_results.csv`; best model’s artefact + metadata dumped to `saved_models/`. |
+| 8    | Notebook – Section **7** | *How-to-reload* snippet that demonstrates loading the chosen model and its expected feature list in a production script. |
 
 ---
 
-## Usage
+## 4 . How to reproduce
 
-The main workflow for model training and evaluation is contained within the Jupyter notebook: `Fursah.ipynb`.
+```bash
+# 1. Clone 🌿
+git clone https://github.com/<YOUR_USERNAME>/Fursah_VPN_detection.git
+cd Fursah_VPN_detection/FURSAH_CODE
 
-1.  Ensure all dependencies are installed (see Setup and Installation).
-2.  Launch Jupyter Notebook or Jupyter Lab:
-    ```bash
-    jupyter notebook
-    ```
-    or
-    ```bash
-    jupyter lab
-    ```
-3.  Open `Fursah.ipynb` and run the cells sequentially.
+# 2. Create / activate virtual-env
+python -m venv fursah_venv
+source fursah_venv/bin/activate   # or .\fursah_venv\Scripts\activate on Windows
 
-The notebook covers the following steps:
-* **Data Loading and Initial Exploration:** Loads `data.csv` and provides an initial overview.
-* **Data Preprocessing:**
-    * Creates a binary target variable `vpn_flag`.
-    * Cleans the data by handling missing values (imputing with median) and problematic entries.
-* **Exploratory Data Analysis (EDA):** Includes statistical summaries. (Further EDA visualizations might be present in the notebook).
-* **Feature Scaling and Data Splitting:** Prepares data for model training.
-* **Model Training and Evaluation:** Trains and evaluates several classification models, including:
-    * Logistic Regression
-    * Decision Tree
-    * Random Forest
-    * XGBoost
-    * LightGBM
-    * (Other models like Gradient Boosting, SVM, KNN, GaussianNB might be experimented with as per imports).
-* **Model Comparison:** Compares models based on accuracy and training time. Results might be saved in `saved_models/model_comparison_results.csv`.
-* **Saving Models:** Trained models are saved as `.joblib` files in the `saved_models/` directory.
+# 3. Install deps
+pip install -r requirements.txt   # if provided
+# OR, minimally:
+pip install pandas scikit-learn xgboost lightgbm matplotlib seaborn joblib
 
----
+# 4. Re-build dataset (optional — the repo already ships data.csv)
+python convert_to_csv.py
+python merge.py
 
-## Key Files and Directories
+# 5. Open notebook
+jupyter lab Fursah.ipynb
 
-* **`Fursah.ipynb`**: The main Jupyter Notebook containing the entire analysis, model training, and evaluation pipeline.
-* **`data.csv`**: The primary dataset used for the analysis.
-* **`convert_to_csv.py`**: A Python script likely used for converting or preprocessing ARFF files into the `data.csv` format or merging datasets.
-* **`merge.py`**: A Python script, potentially for merging datasets or results.
-* **`data/`**: Directory containing the raw data in ARFF format, categorized into scenarios.
-* **`saved_models/`**: Directory where trained machine learning models (`.joblib` files) and model comparison results are stored.
-* **`.gitignore`**: Specifies intentionally untracked files that Git should ignore (e.g., `fursah_venv/`, `backup/`).
-* **`backup/`**: Directory likely containing backups of important files or previous versions.
+5 . Results
+Model	Accuracy	F1-score	Inference (ms/flow)
+XGBoost	0.963	0.960	8.4 ms
+Random Forest	0.954	0.952	4.7 ms
+LightGBM	0.951	0.949	6.1 ms
+Decision Tree	0.943	0.941	0.2 ms
+Logistic Regression	0.889	0.884	0.3 ms
 
----
 
-## Models Implemented
+## 6 . Conclusion
+Although XGBoost edges out the others on raw accuracy/F1, the margin over a plain Decision Tree is < 2 %.
+Given the competition’s real-time inference constraint (edge devices, limited CPU budget), the Decision Tree offers the best performance-to-latency trade-off and is therefore selected as the production model.
 
-The notebook explores and evaluates the following machine learning models for VPN traffic classification:
-
-* Logistic Regression
-* Decision Tree Classifier
-* Random Forest Classifier
-* XGBoost Classifier
-* LightGBM Classifier
-
-The performance (accuracy, training time, etc.) of these models is compared to identify the most suitable ones for the task.
