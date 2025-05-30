@@ -10,7 +10,7 @@ The objective is to learn a model that distinguishes **VPN** from **non-VPN** ne
 ---
 
 ## 2 . Repository layout
-
+```bash
 FURSAH_CODE/
 │
 ├── data/ # Raw datasets
@@ -34,6 +34,7 @@ FURSAH_CODE/
 ├── .gitignore # ignores venv & temp artefacts
 └── fursah_venv/ # local virtual-env (not committed)
 
+```
 
 
 
@@ -78,12 +79,15 @@ python merge.py
 jupyter lab Fursah.ipynb
 ```
 ## 5 . Results
+```
+
 Model	Accuracy	F1-score	Inference (ms/flow)
 XGBoost	0.963	0.960	8.4 ms
 Random Forest	0.954	0.952	4.7 ms
 LightGBM	0.951	0.949	6.1 ms
 Decision Tree	0.943	0.941	0.2 ms
 Logistic Regression	0.889	0.884	0.3 ms
+```
 
 
 ## 6 . Conclusion
