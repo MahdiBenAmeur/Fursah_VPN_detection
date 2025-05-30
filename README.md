@@ -76,8 +76,8 @@ python merge.py
 
 # 5. Open notebook
 jupyter lab Fursah.ipynb
-
-5 . Results
+```
+## 5 . Results
 Model	Accuracy	F1-score	Inference (ms/flow)
 XGBoost	0.963	0.960	8.4 ms
 Random Forest	0.954	0.952	4.7 ms
